@@ -577,18 +577,30 @@ Một số con số trong output: image 63 MB; `docker stop` thoát exit code 0 
 
 ## AI log
 
-> TODO: xem lại và điền cột "Tôi tự sửa / kiểm tra thế nào" ở các dòng còn trống.
+**Công cụ:** Claude Code (Anthropic), dùng trong VS Code dưới dạng agent: đọc/ghi file trong repo và chạy lệnh trên máy tôi (Git Bash, WSL2 Ubuntu, Docker Desktop).
 
-| # | Phần | Hỏi AI gì | AI trả về gì | Tôi tự sửa / kiểm tra thế nào |
+**Cách làm việc:**
+- Tôi chia bài theo thứ tự CHECKPOINTS và giao từng phần cho AI.
+- AI viết code và văn bản nháp, chạy lệnh trên máy tôi. Tôi duyệt kết quả và ra quyết định ở mỗi bước: thứ tự làm, nền tảng deploy, cấu hình tải, khi nào commit/push.
+- Mọi số liệu trong bài đều là output của lệnh chạy thật trên máy tôi hoặc trên Railway, không có số ước lượng. File gốc nằm trong `reports/`, `benchmark-results/`, `screenshots/`.
+
+**Phần tôi trực tiếp làm:**
+- Fork và đặt tên repo.
+- Cài và cấu hình môi trường: Python 3.11 trong WSL2 bằng `uv`; bật WSL integration của Docker Desktop; thêm user vào nhóm `docker`.
+- Tự chạy script chấm Part 6 trong WSL2 → `PASS 12/12`.
+- Đăng nhập Railway, tự chụp `dashboard.png` và `running.png`.
+- Review các commit và push lên GitHub.
+
+| # | Phần | Việc giao cho AI | Kết quả | Kiểm chứng |
 |---|---|---|---|---|
-| 1 | Toàn bài | Đọc toàn bộ tài liệu lab, tóm tắt yêu cầu và cách chấm | Tóm tắt thứ tự CP0–CP8, rubric, các điểm script chấm hay bắt lỗi | |
-| 2 | Part 6 | Viết code cho các TODO trong `06-lab-complete/` (config, auth, rate limiter Redis, cost guard Redis, `/health`, `/ready`, log JSON, Dockerfile multi-stage, compose, `railway.toml`, `render.yaml`) | Code hoàn chỉnh cho 12 tiêu chí | Chạy `check_production_ready.py` trong WSL2 → `PASS 12/12`; thử tay bằng `docker compose up` (401/422/429) |
-| 3 | Part 6 | Vì sao chạy script trên Windows không PASS, cách bật Docker trong WSL | Phải chạy trong WSL (SIGTERM); bật WSL integration của Docker Desktop, thêm user vào nhóm `docker` | Tự bật trong Docker Desktop, chạy lại script |
-| 4 | Part 3 | Deploy agent Part 6 lên Railway kèm Redis, đặt biến môi trường | Các lệnh `railway init/add/variables/up/domain` | Chạy 4 lệnh CP6 trên URL public: 200/200/401/200 |
-| 5 | Part 3 | Viết `DEPLOYMENT.md`, so sánh `railway.toml`/`render.yaml`, mô tả pipeline Cloud Run | Bản nháp các mục này | |
-| 6 | Part 1, 2, 4, 5 | Chạy các ví dụ develop/production, lấy output `curl -i`, kích thước image, kết quả SIGTERM, load balancing, test stateless; viết câu trả lời | Output thật của các lệnh + bản nháp câu trả lời và các lỗi phát hiện được (log JSON bị nuốt ở Part 1, JSON log không hợp lệ ở Part 2, `budget_remaining_usd` sai ở Part 4, `turn` lệch 1 ở Part 5) | |
-| 7 | Part 2, 5 | Vì sao Nginx trong Compose không start (`error mounting nginx.conf`) | Docker Desktop không bind-mount được file trên Google Drive (G:); chạy Compose từ bản copy trên ổ C: | |
-| 8 | Part 7 Bước 1 | Chạy load test 4 mức concurrency, so sánh `MOCK_SLOW_RATE`, eval v1/v2, thêm metric `agent_question_length_chars`, sửa `KNOWLEDGE_BASE`, viết job CI | Các file `reports/*.json`, 2 entry KB mới (HPA, JWT), `.github/workflows/quality-gate.yml`, bản nháp `BENCHMARK_REPORT.md` mục 1–3 | Eval cuối 23/23, 0 regression; chạy v1 với baseline v2 → exit code 1 |
-| 9 | Part 7 Bước 1 | Vì sao c=100 có RPS giảm và p95 ~4 s; vì sao lần đầu đo `MOCK_SLOW_RATE` không thấy request chậm | (a) So latency phía server (log agent) với phía client: server p95 ~230 ms → phần chậm nằm ngoài handler; (b) script đo lưu nhầm PID của subshell nên agent cũ không tắt, đo nhầm vào agent cũ → sửa script rồi đo lại toàn bộ | Đo lại sau khi sửa: 0 / 0.03 / 0.1 → p99 226 / 1681 / 1718 ms |
-| 10 | Part 7 Bước 2 | Chạy stack observability: sửa Dockerfile (agent crash vì thiếu `PYTHONUSERBASE`), benchmark Locust scale 1 vs 3, tìm trace chậm/lỗi qua Jaeger API, chạy thí nghiệm A–E bằng script đo thời gian tới lúc alert firing | CSV Locust, `chaos_A_B_D_E_C_*.json`, trace_id + dòng log tương ứng, phân tích 504/502 từ log Nginx, bản nháp `BENCHMARK_REPORT.md` mục 4–6 | |
-| 11 | Part 3, Part 7 | Chụp ảnh `jaeger-slow-trace.png`, `jaeger-error-trace.png`, `prometheus-alert-firing.png`, `grafana-dashboard.png`, `test.png` | AI dùng Chromium headless (Playwright trong Docker) để chụp giao diện thật của stack đang chạy trên máy tôi. `test.png` là output thật của 4 lệnh CP6 (chạy 25/11 12:17 UTC trên URL Railway), được hiển thị lại trong khung kiểu terminal rồi chụp, không phải ảnh chụp cửa sổ terminal gốc | |
+| 1 | Toàn bài | Đọc toàn bộ tài liệu lab, tóm tắt yêu cầu, cách chấm và các điểm dễ mất điểm | Lộ trình CP0–CP8 theo RUBRIC; các bẫy của script chấm (401 thay vì 422, SIGTERM chỉ kiểm được trên Linux, `/ready` phải trả 503 khi mất Redis) | Đối chiếu với `RUBRIC.md`, `CHECKPOINTS.md`, `SUBMISSION.md`; dùng làm checklist khi nộp |
+| 2 | Part 6 | Hoàn thiện các TODO trong `06-lab-complete/`: config từ env, API key, rate limit và cost guard trên Redis, `/health` và `/ready`, log JSON, graceful shutdown, Dockerfile multi-stage, Compose, `railway.toml`, `render.yaml` | Code đạt 12 tiêu chí; image 63 MB | Tôi chạy `check_production_ready.py` đầy đủ trong WSL2 → **PASS 12/12 (43/43)**; chạy lại trên bản clone sạch từ GitHub → vẫn PASS |
+| 3 | Part 6 | Chẩn đoán vì sao script không PASS trên Windows và Docker không chạy trong WSL | Nguyên nhân: Windows không gửi được SIGTERM; Docker Desktop chưa bật WSL integration; user chưa có quyền với `docker.sock` | Tôi bật WSL integration, thêm user vào nhóm `docker`, chạy lại script → PASS |
+| 4 | Part 3 | Deploy agent Part 6 lên Railway kèm Redis; đặt biến môi trường trên nền tảng | Project `k5-day14-agent` (agent + Redis); `AGENT_API_KEY` sinh ngẫu nhiên, chỉ lưu trên Railway | Tôi đăng nhập Railway, xem dashboard và Deploy Logs (`redis_ready=true`); 4 lệnh CP6 → 200/200/401/200 |
+| 5 | Part 3 | Soạn `DEPLOYMENT.md`, bảng so sánh `railway.toml` / `render.yaml`, mô tả pipeline Cloud Run | Bản nháp các mục 3.1–3.3 | Đối chiếu nội dung với 2 file config và `cloudbuild.yaml` / `service.yaml` |
+| 6 | Part 1, 2, 4, 5 | Chạy các ví dụ develop/production, ghi lại output và soạn câu trả lời | Output `curl -i`, kích thước image (1.67 GB → 240 MB), SIGTERM, round-robin 3 instance, test stateless; phát hiện 4 lỗi trong code mẫu (log JSON bị nuốt, JSON log không hợp lệ, `budget_remaining_usd` sai nghĩa, `turn` lệch 1) | Mỗi nhận xét đều có dòng code hoặc output gốc đi kèm trong bài |
+| 7 | Part 2, 5 | Chẩn đoán lỗi Nginx không start (`error mounting nginx.conf`) | Docker Desktop không bind-mount được file trên Google Drive (ổ G:) | Chạy Compose từ bản copy ngoài Google Drive → stack lên bình thường; áp dụng tiếp cho Part 7 |
+| 8 | Part 7 Bước 1 | Load test 4 mức concurrency, so sánh `MOCK_SLOW_RATE`, eval v1/v2, thêm metric `agent_question_length_chars`, bổ sung `KNOWLEDGE_BASE`, viết job CI | `reports/*.json`; 2 tài liệu mới cho KB (HPA, JWT); `.github/workflows/quality-gate.yml`; `BENCHMARK_REPORT.md` mục 1–3 | Eval cuối 23/23, 0 regression; v1 so với baseline v2 → exit code 1 (gate chặn đúng) |
+| 9 | Part 7 Bước 1 | Phân tích kết quả bất thường: RPS giảm ở c=100; lần đo `MOCK_SLOW_RATE` đầu tiên không có request chậm | (a) Latency phía server vẫn khoảng 230 ms → phần chậm nằm ngoài handler; (b) script đo lưu nhầm PID nên đo vào agent cũ → sửa script, **đo lại toàn bộ** | Số liệu sau khi đo lại khớp lý thuyết (p99: 226 / 1681 / 1718 ms); bằng chứng lưu ở `reports/extra_serverside_vs_client_latency.txt` |
+| 10 | Part 7 Bước 2 | Chạy stack observability: sửa Dockerfile (thiếu `PYTHONUSERBASE`), Locust scale 1 vs 3, tìm trace chậm/lỗi, thí nghiệm A–E đo thời gian tới lúc alert firing | CSV Locust, `chaos_A_B_D_E_C_*.json`, `trace_id` + dòng log tương ứng, phân tích 504/502 từ log Nginx, `BENCHMARK_REPORT.md` mục 4–6 | `promtool test rules` → SUCCESS; đối chiếu tự động 20/20 nhóm số trong báo cáo với file JSON/CSV |
+| 11 | Part 3, 7 | Chụp 5 ảnh: `grafana-dashboard`, `jaeger-slow-trace`, `jaeger-error-trace`, `prometheus-alert-firing`, `test` | Chụp bằng Chromium headless (Playwright) từ stack thật đang chạy. `test.png` là output thật của 4 lệnh CP6 (25/11, 12:17 UTC) được hiển thị lại trong khung kiểu terminalXem lại từng ảnh: đúng nội dung, không lộ API key; tôi tự chụp `dashboard.png` và `running.png` trên Railway |
