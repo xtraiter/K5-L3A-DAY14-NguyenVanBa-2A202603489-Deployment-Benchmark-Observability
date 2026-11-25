@@ -1,0 +1,52 @@
+# Part 7 — Exercise 7.3: quality gate cho agent.
+# Mỗi pull request đụng vào code agent / mock LLM / golden dataset → chạy eval.
+# run_eval.py trả exit code 1 khi accuracy < ngưỡng hoặc có câu bị regression so với baseline
+# → step fail → job fail → PR không merge được (khi bật branch protection "Require status checks").
+name: quality-gate
+
+on:
+  pull_request:
+    paths:
+      - "06-lab-complete/benchmark-observability/develop/**"
+  workflow_dispatch:
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: 06-lab-complete/benchmark-observability/develop
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: 06-lab-complete/benchmark-observability/develop/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Start agent v2
+        # MOCK_ERROR_RATE=0: bỏ lỗi upstream ngẫu nhiên để gate không fail vì "xui"
+        run: |
+          AGENT_VERSION=v2 MOCK_ERROR_RATE=0 PORT=8000 python app.py > agent.log 2>&1 &
+          curl -sf --retry 30 --retry-all-errors --retry-delay 1 http://localhost:8000/health
+
+      - name: Eval + quality gate (accuracy ≥ 85%, không regression so với bản đã merge)
+        run: |
+          python eval/run_eval.py --url http://localhost:8000 \
+            --min-accuracy 0.85 \
+            --baseline reports/eval_v2_fixed.json \
+            --out eval_pr.json
+
+      - name: Upload eval report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: |
+            06-lab-complete/benchmark-observability/develop/eval_pr.json
+            06-lab-complete/benchmark-observability/develop/agent.log
