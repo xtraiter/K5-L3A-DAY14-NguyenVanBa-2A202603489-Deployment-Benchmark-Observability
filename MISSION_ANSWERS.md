@@ -577,7 +577,7 @@ Một số con số trong output: image 63 MB; `docker stop` thoát exit code 0 
 
 ## AI log
 
-> TODO: xem lại, điền cột "Tôi tự sửa / kiểm tra thế nào" và bổ sung các lần dùng AI cho Part 7 Bước 2.
+> TODO: xem lại và điền cột "Tôi tự sửa / kiểm tra thế nào" ở các dòng còn trống.
 
 | # | Phần | Hỏi AI gì | AI trả về gì | Tôi tự sửa / kiểm tra thế nào |
 |---|---|---|---|---|
@@ -590,3 +590,5 @@ Một số con số trong output: image 63 MB; `docker stop` thoát exit code 0 
 | 7 | Part 2, 5 | Vì sao Nginx trong Compose không start (`error mounting nginx.conf`) | Docker Desktop không bind-mount được file trên Google Drive (G:); chạy Compose từ bản copy trên ổ C: | |
 | 8 | Part 7 Bước 1 | Chạy load test 4 mức concurrency, so sánh `MOCK_SLOW_RATE`, eval v1/v2, thêm metric `agent_question_length_chars`, sửa `KNOWLEDGE_BASE`, viết job CI | Các file `reports/*.json`, 2 entry KB mới (HPA, JWT), `.github/workflows/quality-gate.yml`, bản nháp `BENCHMARK_REPORT.md` mục 1–3 | Eval cuối 23/23, 0 regression; chạy v1 với baseline v2 → exit code 1 |
 | 9 | Part 7 Bước 1 | Vì sao c=100 có RPS giảm và p95 ~4 s; vì sao lần đầu đo `MOCK_SLOW_RATE` không thấy request chậm | (a) So latency phía server (log agent) với phía client: server p95 ~230 ms → phần chậm nằm ngoài handler; (b) script đo lưu nhầm PID của subshell nên agent cũ không tắt, đo nhầm vào agent cũ → sửa script rồi đo lại toàn bộ | Đo lại sau khi sửa: 0 / 0.03 / 0.1 → p99 226 / 1681 / 1718 ms |
+| 10 | Part 7 Bước 2 | Chạy stack observability: sửa Dockerfile (agent crash vì thiếu `PYTHONUSERBASE`), benchmark Locust scale 1 vs 3, tìm trace chậm/lỗi qua Jaeger API, chạy thí nghiệm A–E bằng script đo thời gian tới lúc alert firing | CSV Locust, `chaos_A_B_D_E_C_*.json`, trace_id + dòng log tương ứng, phân tích 504/502 từ log Nginx, bản nháp `BENCHMARK_REPORT.md` mục 4–6 | |
+| 11 | Part 3, Part 7 | Chụp ảnh `jaeger-slow-trace.png`, `jaeger-error-trace.png`, `prometheus-alert-firing.png`, `grafana-dashboard.png`, `test.png` | AI dùng Chromium headless (Playwright trong Docker) để chụp giao diện thật của stack đang chạy trên máy tôi. `test.png` là output thật của 4 lệnh CP6 (chạy 25/11 12:17 UTC trên URL Railway), được hiển thị lại trong khung kiểu terminal rồi chụp, không phải ảnh chụp cửa sổ terminal gốc | |

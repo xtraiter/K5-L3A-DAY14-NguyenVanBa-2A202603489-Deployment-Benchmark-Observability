@@ -1,0 +1,12 @@
+# Latency phía client (load_test.py) vs phía server (field ms trong log JSON của agent, chỉ /ask 200)
+# 2026-11-25T11:51:52Z — WSL2, agent v2 (1 uvicorn process), --requests 300
+===== c=50 — client-side (load_test.py):
+  Throughput   : 36.91 req/s
+                 p50=699.3  p90=2608.1  p95=3731.8  p99=4670.6
+----- server-side (http_request ms trong log agent, chỉ /ask 200):
+  n=297  p50=209.4  p95=464.4  p99=1704.4  max=1786.1 ms
+===== c=100 — client-side (load_test.py):
+  Throughput   : 51.43 req/s
+                 p50=871.5  p90=3465.3  p95=3844.6  p99=4385.6
+----- server-side (http_request ms trong log agent, chỉ /ask 200):
+  n=297  p50=199.9  p95=231.1  p99=1689.4  max=1724.4 ms

@@ -1,0 +1,113 @@
+[
+  {
+    "exp": "A",
+    "change": {
+      "MOCK_ERROR_RATE": "0.2"
+    },
+    "alert": "AgentHighErrorRate",
+    "t0": "12:05:16",
+    "pending_after_s": 37,
+    "firing_after_s": 97,
+    "alerts_at_end": {
+      "AgentHighErrorRate": "firing"
+    },
+    "panels_at_end": {
+      "error_rate": 0.2008,
+      "p95_s": 0.2893,
+      "avg_s": 0.2043,
+      "cost_usd_per_h": 1.7744,
+      "instances_up": 2.0,
+      "retrieval_hit_ratio": 1.0,
+      "tokens_in_per_s": 603.2567,
+      "tokens_out_per_s": 322.9115
+    }
+  },
+  {
+    "exp": "B",
+    "change": {
+      "MOCK_SLOW_RATE": "0.3"
+    },
+    "alert": "AgentHighLatencyP95",
+    "t0": "12:07:51",
+    "pending_after_s": 27,
+    "firing_after_s": 148,
+    "alerts_at_end": {
+      "AgentHighLatencyP95": "firing"
+    },
+    "panels_at_end": {
+      "error_rate": 0.0122,
+      "p95_s": 1.9124,
+      "avg_s": 0.6169,
+      "cost_usd_per_h": 0.919,
+      "instances_up": 2.0,
+      "retrieval_hit_ratio": 1.0,
+      "tokens_in_per_s": 584.6373,
+      "tokens_out_per_s": 312.9109
+    }
+  },
+  {
+    "exp": "D",
+    "change": "pause",
+    "alert": "AgentInstanceDown",
+    "t0": "12:11:18",
+    "pending_after_s": 10,
+    "firing_after_s": 40,
+    "alerts_at_end": {
+      "AgentInstanceDown": "firing"
+    },
+    "panels_at_end": {
+      "error_rate": 0.0,
+      "p95_s": 0.2931,
+      "avg_s": 0.2321,
+      "cost_usd_per_h": 0.9253,
+      "instances_up": 1.0,
+      "retrieval_hit_ratio": 1.0,
+      "tokens_in_per_s": 551.4514,
+      "tokens_out_per_s": 294.7465
+    }
+  },
+  {
+    "exp": "E",
+    "change": {
+      "AGENT_VERSION": "v1"
+    },
+    "alert": null,
+    "t0": "12:12:03",
+    "pending_after_s": null,
+    "firing_after_s": null,
+    "alerts_at_end": {},
+    "panels_at_end": {
+      "error_rate": 0.012,
+      "p95_s": 0.1981,
+      "avg_s": 0.2037,
+      "cost_usd_per_h": 0.6902,
+      "instances_up": 2.0,
+      "retrieval_hit_ratio": null,
+      "tokens_in_per_s": 328.2755,
+      "tokens_out_per_s": 178.5932
+    }
+  },
+  {
+    "exp": "C",
+    "change": {
+      "LLM_MODEL": "mock-llm-large"
+    },
+    "alert": "LLMCostBurnRateHigh",
+    "t0": "12:15:08",
+    "pending_after_s": 39,
+    "firing_after_s": 160,
+    "alerts_at_end": {
+      "LLMCostBurnRateHigh": "firing"
+    },
+    "panels_at_end": {
+      "error_rate": 0.0113,
+      "p95_s": 0.6697,
+      "avg_s": 0.4669,
+      "cost_usd_per_h": 9.3537,
+      "instances_up": 2.0,
+      "retrieval_hit_ratio": 1.0,
+      "tokens_in_per_s": 634.5131,
+      "tokens_out_per_s": 338.8034
+    }
+  }
+]

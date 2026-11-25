@@ -1,0 +1,10 @@
+# 2026-11-25T12:37:41Z — Locust 30 users, 2 agent instances, cấu hình mặc định
+== Exercise 7.4 (Prometheus, cửa sổ 1 phút)
+  p95 /ask (s): 0.293
+  p99 /ask (s): 1.822
+  avg /ask (s): 0.231
+  req/s theo instance: 172.18.0.4:8000=9.237, 172.18.0.8:8000=8.910
+  error rate /ask: 0.0060
+  tokens/s theo type: input=1428.2, output=761.9
+  cost USD/giờ: 2.4542
+  retrieval hit ratio: 1.000
