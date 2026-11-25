@@ -1,8 +1,19 @@
 # ============================================================
-# TODO (tiêu chí 12): cấu hình deploy Railway
-#   [build]  builder = "DOCKERFILE"
-#   [deploy] healthcheckPath = "/health"
-#   App phải lắng nghe theo biến PORT do Railway cấp (xử lý trong CMD của Dockerfile).
+# railway.toml — Railway config-as-code
+# Docs: https://docs.railway.com/reference/config-as-code
 #
-# Chỉ cần một trong hai file railway.toml / render.yaml, nhưng file nào có nội dung thì phải đúng.
+# Biến môi trường đặt trên Railway (Dashboard → Variables hoặc CLI), KHÔNG ghi ở đây:
+#   AGENT_API_KEY, REDIS_URL (=${{Redis.REDIS_URL}}), ENVIRONMENT=production,
+#   RATE_LIMIT_PER_MINUTE, DAILY_BUDGET_USD
+# PORT do Railway tự cấp; CMD trong Dockerfile đọc ${PORT}.
 # ============================================================
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/health"
+healthcheckTimeout = 60
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
